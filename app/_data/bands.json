@@ -1,0 +1,63 @@
+[
+  {
+    "start": 510,
+    "end": 540,
+    "title": "Registration"
+  },
+  {
+    "start": 540,
+    "end": 570,
+    "title": "Coffee"
+  },
+  {
+    "start": 570,
+    "end": 585,
+    "title": "Opening",
+    "track": "Hall 1A"
+  },
+  {
+    "start": 690,
+    "end": 720,
+    "title": "Coming soon",
+    "track": "Hall 1B",
+    "tba": true
+  },
+  {
+    "start": 720,
+    "end": 780,
+    "title": "Lunch"
+  },
+  {
+    "start": 900,
+    "end": 930,
+    "title": "Afternoon break"
+  },
+  {
+    "start": 1010,
+    "end": 1030,
+    "title": "Closing & prizes",
+    "track": "Hall 1A"
+  },
+  {
+    "start": 1080,
+    "end": 1320,
+    "title": "After-party",
+    "layout": [
+      1030,
+      1060
+    ],
+    "details": [
+      {
+        "text": "Three Sheets",
+        "href": "https://threesheetsbelfast.com/"
+      },
+      {
+        "text": "1 Bankmore Square, Belfast BT7 1DH",
+        "href": "https://www.google.com/maps/search/?api=1&query=Three+Sheets,+1+Bankmore+Square,+Belfast+BT7+1DH"
+      },
+      {
+        "text": "Pizza and beer"
+      }
+    ]
+  }
+]
