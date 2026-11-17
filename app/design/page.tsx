@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import { Plus, Share2 } from "lucide-react";
+import { Fragment, type ReactNode } from "react";
 import AddToAgenda from "../_components/AddToAgenda";
+import LinkList from "../_components/LinkList";
+import SessionList from "../_components/SessionList";
+import SpeakerByline from "../_components/SpeakerByline";
 import PreviewPicks from "../_components/PreviewPicks";
 import SpeakerCard from "../_components/SpeakerCard";
 import SpeakerLinks from "../_components/SpeakerLinks";
@@ -76,7 +80,7 @@ const NOT_YET: string[] = [
   "Agenda list: clashes still use the old yellow outline and a note instead of the status line.",
   "Desktop agenda grid: a picked talk is a white fill, not green.",
   "Speaker page (/speakers/…): its own layout, not the speaker card.",
-  "Talks and Workshops pages, Villages and Home: still the original styles.",
+  "Home: still the original hero.",
 ];
 
 function Section({ id, title, lead, children }: { id: string; title: string; lead?: string; children: ReactNode }) {
@@ -112,9 +116,18 @@ function Props({ rows }: { rows: [string, string, string][] }) {
 }
 const Code = ({ children }: { children: string }) => <pre className="ds-code"><code>{children}</code></pre>;
 
+const BTN_VARIANTS: [string, string][] = [
+  ["primary", "Build my agenda"], ["secondary", "Add these to mine"], ["outline", "Share my agenda"],
+  ["ghost", "Keep mine"], ["destructive", "Clear my agenda"], ["link", "See all talks"],
+];
+const BTN_STATES: [{ cls?: string; disabled?: boolean; busy?: boolean }, string][] = [
+  [{}, "Default"], [{ cls: "is-hover" }, "Hover"], [{ cls: "is-focus" }, "Focus"], [{ cls: "is-active" }, "Pressed"],
+  [{ disabled: true }, "Disabled"], [{ busy: true }, "Loading"],
+];
+
 const NAV: [string, string][] = [
   ["principles", "Principles"], ["colour", "Colour"], ["type", "Type"], ["space", "Space and shape"], ["photo", "Over photos"],
-  ["add", "Add to agenda"], ["talk-card", "Talk card"], ["status", "Status line"], ["links", "Speaker links"], ["sheet", "Sheet"], ["speaker-card", "Speaker card"], ["button", "Button"],
+  ["add", "Add to agenda"], ["talk-card", "Talk card"], ["status", "Status line"], ["links", "Speaker links"], ["sheet", "Sheet"], ["speaker-card", "Speaker card"], ["byline", "Speaker byline"], ["link-list", "Link list"], ["tags", "Tags"], ["session", "Session"], ["page-head", "Page head"], ["button", "Button"],
   ["not-yet", "Not migrated yet"],
 ];
 
@@ -125,9 +138,9 @@ export default function DesignPage() {
         <p>Foundations</p>
         {NAV.slice(0, 5).map(([id, l]) => <a key={id} href={`#${id}`}>{l}</a>)}
         <p>Components</p>
-        {NAV.slice(5, 12).map(([id, l]) => <a key={id} href={`#${id}`}>{l}</a>)}
+        {NAV.slice(5, 17).map(([id, l]) => <a key={id} href={`#${id}`}>{l}</a>)}
         <p>Status</p>
-        {NAV.slice(12).map(([id, l]) => <a key={id} href={`#${id}`}>{l}</a>)}
+        {NAV.slice(17).map(([id, l]) => <a key={id} href={`#${id}`}>{l}</a>)}
       </nav>
 
       <main className="ds-main">
@@ -268,12 +281,82 @@ export default function DesignPage() {
           <Props rows={[["speaker", "Speaker", "From SPEAKERS (app/_lib/speakers.ts)."]]} />
         </Section>
 
-        <Section id="button" title="Button" lead="Pills, for actions that aren't on a card.">
-          <div className="ds-row">
-            <button type="button" className="btn btn-primary">Build my agenda</button>
-            <button type="button" className="btn btn-secondary">Add these to mine</button>
-            <button type="button" className="btn btn-ghost">Keep mine</button>
+        <Section id="byline" title="Speaker byline" lead="A speaker on a surface: face, name (to their page), tagline, and their links as a row. Optional bio underneath.">
+          <div className="ds-grid">
+            <Demo label="With links"><div className="ds-fill"><SpeakerByline person={adam} /></div></Demo>
+            <Demo label="One link"><div className="ds-fill"><SpeakerByline person={iz} /></div></Demo>
+            <Demo label="No links"><div className="ds-fill"><SpeakerByline person={nathan} /></div></Demo>
           </div>
+          <Props rows={[["person", "{ name, tagline, photo, bio? }", "The speaker."], ["bio", "boolean", "Show the bio under the byline."]]} />
+          <Code>{`<SpeakerByline person={speaker} />`}</Code>
+        </Section>
+
+        <Section id="link-list" title="Link list" lead="Outbound links as rows: icon, what it is, where it goes. In the speaker links sheet and on village cards.">
+          <div className="ds-grid">
+            <Demo label="Links"><div className="ds-fill"><LinkList links={[
+              { kind: "website", url: "https://niraspberryjam.com/" },
+              { kind: "linkedin", url: "https://www.linkedin.com/company/atlantic-exploit-labs", label: "Atlantic Exploit Labs" },
+              { kind: "email", url: "mailto:info@niraspberryjam.com" },
+            ]} /></div></Demo>
+          </div>
+          <p className="ds-note">Kinds: linkedin, website, blog, twitter, instagram, facebook, email, other. The label defaults to the kind.</p>
+          <Props rows={[["links", "{ kind, url, label? }[]", "The links, in order."]]} />
+        </Section>
+
+        <Section id="tags" title="Tags" lead="Small facts about a session: format, level, topic. Not buttons.">
+          <div className="ds-row"><ul className="tags"><li>Talk</li><li>Introductory</li><li>Security</li></ul></div>
+          <Code>{`<ul className="tags"><li>Talk</li>…</ul>`}</Code>
+        </Section>
+
+        <Section id="session" title="Session" lead="How /talks and /workshops show a session: the talk card with its status, tags, the opening paragraph and who's speaking; the rest behind “Read more”. Grouped under its start time.">
+          <PreviewPicks picks={[RAJ]}>
+            <div className="ds-session"><SessionList filter={(t) => t.id === ADAM} /></div>
+          </PreviewPicks>
+          <Code>{`<SessionList filter={(t) => t.format === "Workshop"} />`}</Code>
+        </Section>
+
+        <Section id="page-head" title="Page head" lead="Every content page opens with its title and one line on what it is.">
+          <div className="ds-fill"><header className="page-head"><h1>Workshops</h1><p>Hour-long, hands-on sessions, all in Room 2A.</p></header></div>
+          <Code>{`<header className="page-head"><h1>Workshops</h1><p>…</p></header>`}</Code>
+        </Section>
+
+        <Section id="button" title="Button" lead="The “Build my agenda” shape: 8px corners, Poppins, 44px tall. For actions that aren't on a card. Variants, sizes and states follow shadcn.">
+          <h3 className="ds-sub">Variants</h3>
+          <div className="ds-row">
+            {BTN_VARIANTS.map(([v, label]) => <button key={v} type="button" className={`btn btn-${v}`}>{label}</button>)}
+          </div>
+          <h3 className="ds-sub">States</h3>
+          <div className="ds-btn-grid">
+            <span />
+            {BTN_STATES.map(([, s]) => <span key={s} className="ds-btn-head">{s}</span>)}
+            {BTN_VARIANTS.map(([v]) => (
+              <Fragment key={v}>
+                <span className="ds-btn-head">{v}</span>
+                {BTN_STATES.map(([props, s]) => (
+                  <span key={s}><button type="button" className={`btn btn-${v} ${props.cls ?? ""}`} disabled={props.disabled} aria-busy={props.busy}>Button</button></span>
+                ))}
+              </Fragment>
+            ))}
+          </div>
+          <h3 className="ds-sub">Sizes</h3>
+          <div className="ds-row">
+            <button type="button" className="btn btn-primary btn-sm">Small</button>
+            <button type="button" className="btn btn-primary">Default</button>
+            <button type="button" className="btn btn-primary btn-lg">Large</button>
+            <button type="button" className="btn btn-outline btn-icon" aria-label="Add"><Plus size={18} aria-hidden /></button>
+          </div>
+          <h3 className="ds-sub">With an icon</h3>
+          <div className="ds-row">
+            <button type="button" className="btn btn-primary"><Share2 size={16} aria-hidden /> Share my agenda</button>
+            <button type="button" className="btn btn-outline"><Plus size={16} aria-hidden /> Add these to mine</button>
+          </div>
+          <p className="ds-note">Small (36px) is for dense desktop rows only; on a phone use the default. Destructive is for removing things for good, such as clearing your agenda. The label says what happens: “Use this agenda”, not “OK”.</p>
+          <Props rows={[
+            ["btn-{variant}", "primary | secondary | outline | ghost | destructive | link", "How much it stands out. One primary per view."],
+            ["btn-{size}", "sm | lg | icon", "Default needs no class. Icon is square; give it an aria-label."],
+            ["disabled", "boolean", "Can't be used right now."],
+            ["aria-busy", "boolean", "Working: shows a spinner."],
+          ]} />
           <Code>{`<button className="btn btn-primary">Build my agenda</button>`}</Code>
         </Section>
 

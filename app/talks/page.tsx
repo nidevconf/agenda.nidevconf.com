@@ -8,8 +8,11 @@ export const metadata: Metadata = {
 
 export default function TalksPage() {
   return (
-    <div className="page-wrap sessions">
-      <h1 className="sec-title">Talks</h1>
+    <div className="page-wrap page">
+      <header className="page-head">
+        <h1>Talks</h1>
+        <p>Every talk in running order. Workshops have their own page.</p>
+      </header>
       <SessionList filter={(t) => t.format !== "Workshop"} />
     </div>
   );

@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import type { Metadata } from "next";
+import LinkList, { type LinkKind } from "../_components/LinkList";
 
 export const metadata: Metadata = {
   title: "Villages",
@@ -17,7 +18,7 @@ type Village = {
   atNidc: string | string[] | { title: string; text: string }[];
   // optional photo of the village's stand, shown at the top of its card
   image?: { src: string; alt: string };
-  links: { label: string; href?: string }[];
+  links: { kind: LinkKind; label: string; href: string }[];
 };
 
 const villages: Village[] = [
@@ -32,18 +33,9 @@ const villages: Village[] = [
       "Drop by and have some retro fun!",
     ],
     links: [
-      {
-        label: "timelineexperience.netlify.app",
-        href: "https://timelineexperience.netlify.app",
-      },
-      {
-        label: "Facebook: Timeline Carrickfergus",
-        href: "https://www.facebook.com/people/Timeline-Carrickfergus/61592370308595/",
-      },
-      {
-        label: "TimelineExperience@outlook.com",
-        href: "mailto:TimelineExperience@outlook.com",
-      },
+      { kind: "website", label: "Website", href: "https://timelineexperience.netlify.app" },
+      { kind: "facebook", label: "Timeline Carrickfergus", href: "https://www.facebook.com/people/Timeline-Carrickfergus/61592370308595/" },
+      { kind: "email", label: "Email", href: "mailto:TimelineExperience@outlook.com" },
     ],
   },
   {
@@ -54,10 +46,7 @@ const villages: Village[] = [
     atNidc:
       "We have a number of challenges that are designed to be solved without requiring participants to bring any additional hardware.",
     links: [
-      {
-        label: "LinkedIn: Atlantic Exploit Labs",
-        href: "https://www.linkedin.com/company/atlantic-exploit-labs",
-      },
+      { kind: "linkedin", label: "Atlantic Exploit Labs", href: "https://www.linkedin.com/company/atlantic-exploit-labs" },
     ],
   },
   {
@@ -77,8 +66,8 @@ const villages: Village[] = [
       },
     ],
     links: [
-      { label: "niraspberryjam.com", href: "https://niraspberryjam.com/" },
-      { label: "info@niraspberryjam.com", href: "mailto:info@niraspberryjam.com" },
+      { kind: "website", label: "Website", href: "https://niraspberryjam.com/" },
+      { kind: "email", label: "Email", href: "mailto:info@niraspberryjam.com" },
     ],
   },
   {
@@ -90,66 +79,49 @@ const villages: Village[] = [
     atNidc:
       "We’ll bring 3D printers so you can give it a go on the day and have something to take home. We’ll also bring a giant, programmable, LED ping pong table from Robin Price’s “This is a table” project, built with Farset Labs members over the past few months.",
     links: [
-      { label: "farsetlabs.org.uk", href: "https://www.farsetlabs.org.uk/" },
-      { label: "tog.ie", href: "https://www.tog.ie/" },
+      { kind: "website", label: "Farset Labs", href: "https://www.farsetlabs.org.uk/" },
+      { kind: "website", label: "Tog Hackerspace", href: "https://www.tog.ie/" },
     ],
   },
 ];
 
 export default function VillagesPage() {
   return (
-    <div className="page-wrap villages-page">
-      <h1 className="sec-title">
-        The <span className="hl">villages</span>.
-      </h1>
-      <p className="page-lead">Themed, hands-on spaces run by the community. Drop in any time on the day.</p>
+    <div className="page-wrap page">
+      <header className="page-head">
+        <h1>Villages</h1>
+        <p>Themed, hands-on spaces run by the community. Drop in any time on the day; no need to book.</p>
+      </header>
 
-      <figure className="statement-photo">
-        <img
-          src="/images/village.jpg"
-          width="1600"
-          height="1066"
-          alt="An attendee works at a laptop beside a desktop 3D printer and reels of filament at an NIDC village stand"
-        />
-      </figure>
-
-      <p className="villages-intro">
-        Between the talks, the villages are where you get your hands on things. Each one is run by a group from
-        the community, with something to try, play with or solve. No need to book, just wander in.
-      </p>
+      <img
+        className="page-photo"
+        src="/images/village.jpg"
+        width="1600"
+        height="1066"
+        alt="An attendee works at a laptop beside a desktop 3D printer and reels of filament at an NIDC village stand"
+      />
 
       <ul className="villages">
         {villages.map((v) => (
           <li key={v.id} id={v.id} className="village">
             {v.image && <img className="village-photo" src={v.image.src} alt={v.image.alt} loading="lazy" />}
-            <div className="village-body">
-              <p className="village-theme">{v.theme}</p>
-              <h2 className="village-name">{v.name}</h2>
-              <h3>About {v.name}</h3>
-              <p>{v.about}</p>
-              <h3>At NIDC</h3>
-              {[v.atNidc].flat().map((w) =>
-                typeof w === "string" ? (
-                  <p key={w}>{w}</p>
-                ) : (
-                  <div key={w.title} className="village-workshop">
-                    <h4>{w.title}</h4>
-                    <p>{w.text}</p>
-                  </div>
-                ),
-              )}
-              <p className="facts village-links">
-                {v.links.map((l) =>
-                  l.href ? (
-                    <a key={l.label} href={l.href}>
-                      {l.label}
-                    </a>
-                  ) : (
-                    <span key={l.label}>{l.label}</span>
-                  ),
-                )}
-              </p>
-            </div>
+            <p className="ag-track">{v.theme}</p>
+            <h2>{v.name}</h2>
+            <p className="village-text">{v.about}</p>
+            <h3>At NIDC</h3>
+            {[v.atNidc].flat().map((w) =>
+              typeof w === "string" ? (
+                <p key={w} className="village-text">
+                  {w}
+                </p>
+              ) : (
+                <div key={w.title} className="village-workshop">
+                  <h4>{w.title}</h4>
+                  <p>{w.text}</p>
+                </div>
+              ),
+            )}
+            <LinkList links={v.links.map((l) => ({ kind: l.kind, url: l.href, label: l.label }))} />
           </li>
         ))}
       </ul>

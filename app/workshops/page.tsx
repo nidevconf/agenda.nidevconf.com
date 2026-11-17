@@ -8,9 +8,11 @@ export const metadata: Metadata = {
 
 export default function WorkshopsPage() {
   return (
-    <div className="page-wrap sessions">
-      <h1 className="sec-title">Workshops</h1>
-      <p className="page-lead">Hour-long, hands-on sessions, all in Room 2A.</p>
+    <div className="page-wrap page">
+      <header className="page-head">
+        <h1>Workshops</h1>
+        <p>Hour-long, hands-on sessions, all in Room 2A.</p>
+      </header>
       <SessionList filter={(t) => t.format === "Workshop"} />
     </div>
   );
