@@ -16,13 +16,6 @@
     "track": "Hall 1A"
   },
   {
-    "start": 690,
-    "end": 720,
-    "title": "Coming soon",
-    "track": "Hall 1B",
-    "tba": true
-  },
-  {
     "start": 720,
     "end": 780,
     "title": "Lunch"

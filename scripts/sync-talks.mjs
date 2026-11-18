@@ -85,6 +85,7 @@ const PINNED = {
   "tony-mcbride-cv": [at(15, 30), 4],
   "kainos-lee-service": [at(10), 0],
   "payroc-david-edwards": [at(13), 0],
+  "magnite-charlie-molloy": [at(11, 30), 1],
 };
 const pinned = (start, track) =>
   sessions.find((s) => PINNED[s.id]?.[0] === start && PINNED[s.id]?.[1] === track);

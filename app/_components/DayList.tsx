@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import bands from "../_data/bands.json";
-import { LIVE, overlaps, when } from "../_lib/schedule";
+import { BANDS, LIVE, overlaps, when } from "../_lib/schedule";
 import { talkStep } from "./AgendaBuilder";
 import BandCard from "./BandCard";
 import TalkCard from "./TalkCard";
 
-const FIXED = bands.filter((b) => !b.tba); // "Coming soon" placeholders left out
+const FIXED = BANDS.filter((b) => !b.tba); // "Coming soon" placeholders left out
 // the talk slots: when the 30-minute talks start, and when they end
 const SLOTS = [
   ...new Set(LIVE.filter((t) => t.format === "Talk").map((t) => t.start)),
