@@ -40,6 +40,11 @@ function parsePicks(raw: string | null): string[] {
   }
 }
 
+/** The saved picks right now, read straight from storage (not a render snapshot). */
+export function readPicks() {
+  return parsePicks(readRaw(PICKS_KEY));
+}
+
 export function usePicks() {
   const raw = useSyncExternalStore(subscribe, () => readRaw(PICKS_KEY), () => null);
   return useMemo(() => parsePicks(raw), [raw]);

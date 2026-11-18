@@ -24,7 +24,7 @@ export default function HomePage() {
           </span>
         </p>
         <div className="hero-cta">
-          <TiltBadge href="/agenda">Build my agenda</TiltBadge>
+          <TiltBadge href="/agenda/build">Build my agenda</TiltBadge>
         </div>
       </div>
       <SponsorStrip />

@@ -1,19 +1,22 @@
 "use client";
 
-import bands from "../_data/bands.json";
+import Link from "next/link";
 import talks from "../_data/talks.json";
 import { decodeAgenda } from "../_lib/agenda-code";
-import { clearShareParams, setPicks, useName, usePicks, useQueryParam } from "../_lib/picks";
+import {
+  clearShareParams,
+  PicksOverride,
+  setName,
+  setPicks,
+  usePicks,
+  useQueryParam,
+} from "../_lib/picks";
+import DayList from "./DayList";
 import ScheduleGrid from "./ScheduleGrid";
-import ShareBar from "./ShareBar";
-import TalkCard, { clock, duration } from "./TalkCard";
+import ShareBar, { NameField } from "./ShareBar";
 
-type Band = { start: number; end: number; title: string; track?: string; details?: { text: string; href?: string }[] };
-type Talk = (typeof talks)[number];
-
-/* Your day: every break and every talk you've picked, in time order, with an
-   open slot (pick one of N) wherever a slot is still empty — so this page is
-   where you build the day, not just read it. A shared link previews someone
+/* Your day: what you've picked and the fixed parts of the day (DayList), in
+   time order; picking happens in the agenda builder (/agenda/build). A shared link previews someone
    else's picks first and asks before it touches yours; its add buttons are
    hidden while previewing (action="none"), since tapping one would otherwise
    silently edit your own agenda instead of the one on screen.
@@ -31,30 +34,14 @@ export default function AgendaDay() {
   // live subset instead.
   const liveTalks = talks.filter((t) => !t.withdrawn);
   const sharedIds = sharedHex ? decodeAgenda(sharedHex, talks) : null;
-  const sameAsMine =
-    sharedIds !== null && sharedIds.length === myPicks.length && sharedIds.every((id) => myPicks.includes(id));
-  const previewing = sharedIds !== null && sharedIds.length > 0 && !sameAsMine;
+  const previewing = sharedIds !== null && sharedIds.length > 0;
 
   const idsSet = new Set(previewing ? sharedIds! : myPicks);
   const picked = liveTalks.filter((t) => idsSet.has(t.id));
 
-  const starts = [...new Set(liveTalks.map((t) => t.start))];
-  const openStarts = previewing ? [] : starts.filter((s) => !picked.some((t) => t.start <= s && s < t.end));
-
-  type Item =
-    | { start: number; kind: "band"; band: Band }
-    | { start: number; kind: "talk"; talk: Talk }
-    | { start: number; kind: "open"; options: Talk[] };
-  const items: Item[] = [
-    ...bands.filter((b) => !b.tba).map((band): Item => ({ start: band.start, kind: "band", band })),
-    ...picked.map((talk): Item => ({ start: talk.start, kind: "talk", talk })),
-    ...openStarts.map((start): Item => ({ start, kind: "open", options: liveTalks.filter((t) => t.start === start) })),
-  ].sort((a, b) => a.start - b.start);
-
-  const clashesOf = (t: Talk) => picked.filter((o) => o.id !== t.id && o.start < t.end && t.start < o.end);
-
   function adopt() {
     setPicks(sharedIds!);
+    if (sharedName) setName(sharedName);
     clearShareParams();
   }
   function addToMine() {
@@ -66,29 +53,45 @@ export default function AgendaDay() {
     <div className="agenda">
       <div className="my-head">
         <div>
-          <h1 className={previewing ? "sec-title" : "sr-only"}>{previewing ? `${sharedName || "A friend"}'s agenda` : "My agenda"}</h1>
-          {picked.length > 0 && <p className="my-count">{picked.length} talk{picked.length > 1 ? "s" : ""}</p>}
+          <h1 className={previewing ? "sec-title" : "sr-only"}>
+            {previewing ? `${sharedName || "A friend"}'s agenda` : "My agenda"}
+          </h1>
         </div>
-        {!previewing && <ShareBar picks={myPicks} />}
+        {!previewing && (
+          <div className="name-row">
+            <NameField />
+            <ShareBar picks={myPicks} />
+          </div>
+        )}
       </div>
 
       {previewing && (
         <div className="my-shared" role="status">
           <p>
-            This is {sharedName || "a friend"}&apos;s agenda — {sharedIds!.length} talk
+            This is {sharedName || "a friend"}&apos;s agenda —{" "}
+            {sharedIds!.length} talk
             {sharedIds!.length > 1 ? "s" : ""}.
-            {myPicks.length > 0 && ` You have ${myPicks.length} of your own on this device.`}
+            {myPicks.length > 0 &&
+              ` You have ${myPicks.length} of your own on this device.`}
           </p>
           <div className="btn-row">
             <button type="button" className="btn btn-primary" onClick={adopt}>
-              {myPicks.length ? "Replace mine with this" : "Use this agenda"}
+              {sharedName ? `Use ${sharedName}'s agenda` : "Use this agenda"}
             </button>
             {myPicks.length > 0 && (
-              <button type="button" className="btn btn-secondary" onClick={addToMine}>
-                Add these to mine
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={addToMine}
+              >
+                Add to mine
               </button>
             )}
-            <button type="button" className="btn btn-ghost" onClick={clearShareParams}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={clearShareParams}
+            >
               {myPicks.length ? "Keep mine" : "Dismiss"}
             </button>
           </div>
@@ -98,64 +101,21 @@ export default function AgendaDay() {
       {/* desktop shows the whole day as the main site's grid; phones get the list below */}
       <ScheduleGrid picked={idsSet} previewing={previewing} />
 
-      <ul className="agenda-list">
-        {items.map((item) => {
-          if (item.kind === "band") {
-            return (
-              <li key={`band-${item.band.start}`} className="ag-item ag-band">
-                <p className="ag-title">
-                  {item.band.title}
-                  {item.band.track && ` · ${item.band.track}`}
-                </p>
-                <p className="ag-when">
-                  {clock(item.band.start)} ({duration(item.band.end - item.band.start)})
-                </p>
-                {item.band.details && (
-                  <p className="ag-band-details">
-                    {item.band.details.map((d, i) => (
-                      <span key={d.text}>
-                        {i > 0 && " · "}
-                        {d.href ? (
-                          <a href={d.href} target="_blank" rel="noopener noreferrer">
-                            {d.text}
-                          </a>
-                        ) : (
-                          d.text
-                        )}
-                      </span>
-                    ))}
-                  </p>
-                )}
-              </li>
-            );
-          }
-          if (item.kind === "talk") {
-            const clashes = clashesOf(item.talk);
-            return (
-              <TalkCard
-                key={item.talk.id}
-                talk={item.talk}
-                action={previewing ? "none" : "add"}
-                clashNote={clashes.length ? `Clashes with "${clashes[0].title}" in ${clashes[0].track}` : undefined}
-              />
-            );
-          }
-          return (
-            <li key={`open-${item.start}`} className="ag-item ag-open">
-              <details>
-                <summary>
-                  {clock(item.start)} · Open slot · pick one of {item.options.length}
-                </summary>
-                <ul className="ag-open-options">
-                  {item.options.map((o) => (
-                    <TalkCard key={o.id} talk={o} />
-                  ))}
-                </ul>
-              </details>
-            </li>
-          );
-        })}
-      </ul>
+      {/* phones: your day as a list (the same one the agenda builder ends on) */}
+      <div className="agenda-list">
+        {picked.length === 0 && !previewing && (
+          <p className="my-empty">
+            Nothing on your agenda yet.{" "}
+            <Link href="/agenda/build">Build it step by step</Link>.
+          </p>
+        )}
+        {/* previewing someone else's: their picks drive the colours, and nothing can be edited */}
+        <PicksOverride
+          value={previewing ? { picks: sharedIds!, setPicks: () => {} } : null}
+        >
+          <DayList ids={[...idsSet]} readOnly={previewing} />
+        </PicksOverride>
+      </div>
     </div>
   );
 }

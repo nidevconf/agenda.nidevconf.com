@@ -1,45 +1,88 @@
 "use client";
 
-import { Share2 } from "lucide-react";
+import qrcode from "qrcode-generator";
 import { useState } from "react";
 import talks from "../_data/talks.json";
 import { encodeAgenda } from "../_lib/agenda-code";
 import { setName, useName } from "../_lib/picks";
+import Sheet from "./Sheet";
 
-/* Turns your picks into a link: ?name=<you>&agenda=<hex bitset>. Asks for a
-   name once (cached for next time) then hands the link to the native share
-   sheet on a phone, or the clipboard on a desktop. */
-export default function ShareBar({ picks }: { picks: string[] }) {
+/* Your name, kept on this device; it goes into the link you share. */
+export function NameField() {
   const name = useName();
+  return (
+    <label className="field">
+      <span>Name (optional)</span>
+      <input type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
+    </label>
+  );
+}
+
+/* Turns your picks into a link (?name=<you>&agenda=<hex bitset>; the name only if you
+   gave one) and shows it in a sheet: your name, a QR code to scan off your screen, and
+   the link to copy. Both follow the name as you type it. */
+export default function ShareBar({ picks }: { picks: string[] }) {
+  const name = useName().trim();
+  const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   if (picks.length === 0) return null;
 
-  async function share() {
-    const who = name || window.prompt("Your name, so people know whose agenda this is:")?.trim();
-    if (!who) return;
-    if (who !== name) setName(who);
+  const q = new URLSearchParams();
+  if (name) q.set("name", name);
+  q.set("agenda", encodeAgenda(picks, talks));
+  const url = open ? `${location.origin}${location.pathname}?${q}` : "";
 
-    const hex = encodeAgenda(picks, talks);
-    const url = `${location.origin}${location.pathname}?name=${encodeURIComponent(who)}&agenda=${hex}`;
-    const text = `${who}'s NIDC 2026 agenda — ${picks.length} talk${picks.length > 1 ? "s" : ""}`;
-
-    if (navigator.share) {
-      navigator.share({ title: "My NIDC 2026 agenda", text, url }).catch(() => {});
-      return;
-    }
-    navigator.clipboard?.writeText(url).then(
-      () => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      },
-      () => prompt("Copy this link to your agenda:", url),
-    );
+  function copy() {
+    navigator.clipboard?.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   }
 
   return (
-    <button type="button" className="btn btn-primary share-btn" onClick={share}>
-      <Share2 size={16} aria-hidden /> {copied ? "Link copied" : "Share my agenda"}
-    </button>
+    <>
+      <button type="button" className="btn btn-primary" onClick={() => setOpen(true)}>
+        Share
+      </button>
+      {open && (
+        <Sheet title="Share my agenda" onClose={() => setOpen(false)}>
+          <div className="share-name">
+            <NameField />
+          </div>
+          <p className="share-whose">{name ? `${name}'s agenda` : "My agenda"}</p>
+          <QR text={url} />
+          <div className="share-link">
+            <input
+              type="text"
+              readOnly
+              value={url}
+              aria-label="Link to your agenda"
+              onFocus={(e) => e.target.select()}
+            />
+            <button type="button" className="btn btn-primary" onClick={copy}>
+              {copied ? "Copied" : "Copy"}
+            </button>
+          </div>
+        </Sheet>
+      )}
+    </>
+  );
+}
+
+/* the code as one SVG path, a module per unit, with the 4-module quiet zone scanners need */
+function QR({ text }: { text: string }) {
+  const qr = qrcode(0, "M");
+  qr.addData(text);
+  qr.make();
+  const n = qr.getModuleCount();
+  let d = "";
+  for (let r = 0; r < n; r++)
+    for (let c = 0; c < n; c++) if (qr.isDark(r, c)) d += `M${c + 4} ${r + 4}h1v1h-1z`;
+  return (
+    <svg className="share-qr" viewBox={`0 0 ${n + 8} ${n + 8}`} role="img" aria-label="QR code for the link">
+      <rect width="100%" height="100%" fill="#fff" />
+      <path d={d} fill="#000" />
+    </svg>
   );
 }

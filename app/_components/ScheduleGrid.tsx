@@ -88,22 +88,6 @@ export default function ScheduleGrid({ picked, previewing }: { picked: Set<strin
           return (
             <li key={key} className="ag-item ag-band" style={style}>
               <p className="ag-title">{b.title}</p>
-              {b.details && (
-                <p className="ag-band-details">
-                  {b.details.map((d, i) => (
-                    <span key={d.text}>
-                      {i > 0 && " · "}
-                      {d.href ? (
-                        <a href={d.href} target="_blank" rel="noopener noreferrer">
-                          {d.text}
-                        </a>
-                      ) : (
-                        d.text
-                      )}
-                    </span>
-                  ))}
-                </p>
-              )}
               <p className="ag-when">{whenOf(item)}</p>
             </li>
           );

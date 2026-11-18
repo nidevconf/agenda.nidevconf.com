@@ -22,6 +22,9 @@ export default function SiteHeader() {
             <X className="menu-close" size={22} aria-hidden />
           </summary>
           <nav aria-label="Primary">
+            <Link href="/agenda" onClick={close}>
+              Agenda
+            </Link>
             <Link href="/talks" onClick={close}>
               Talks
             </Link>
@@ -34,7 +37,7 @@ export default function SiteHeader() {
             <Link href="/villages" onClick={close}>
               Villages
             </Link>
-            <Link className="btn btn-primary" href="/agenda" onClick={close}>
+            <Link className="btn btn-primary" href="/agenda/build" onClick={close}>
               Build my agenda
             </Link>
           </nav>
