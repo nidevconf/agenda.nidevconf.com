@@ -173,8 +173,8 @@ button { font: inherit; }
   display: flex; flex-direction: column; padding: 8px 20px 16px; max-width: 1180px; margin: 0 auto; }
 .menu nav a { font-family: var(--display); font-weight: 600; font-size: 20px; color: var(--ink); padding: 10px 0; }
 .menu nav a:hover { color: var(--pink-dk); text-decoration: none; }
-.menu nav .btn { align-self: flex-start; margin-top: 12px; padding: 12px 22px; font-size: 16px; color: var(--on-ink); }
-.menu nav .btn:hover { color: var(--on-ink); }
+.menu nav .btn { align-self: flex-start; margin-top: 12px; padding: 12px 22px; font-size: 16px; }
+.menu nav .btn-primary, .menu nav .btn-primary:hover { color: var(--on-ink); }
 
 /* ---- add to agenda (.fav, AddToAgenda.tsx): a round plus that turns into a tick ---- */
 .fav {

@@ -4,6 +4,7 @@
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
+import InstallApp from "./InstallApp";
 
 export default function SiteHeader() {
   const menu = useRef<HTMLDetailsElement>(null);
@@ -40,6 +41,7 @@ export default function SiteHeader() {
             <Link className="btn btn-primary" href="/agenda/build" onClick={close}>
               Build my agenda
             </Link>
+            <InstallApp onDone={close} />
           </nav>
         </details>
       </div>

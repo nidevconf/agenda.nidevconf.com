@@ -1,6 +1,4 @@
-import { when } from "../_lib/schedule";
-
-export type Band = { start: number; end: number; title: string; track?: string };
+import { type Band, when } from "../_lib/schedule";
 
 /* A fixed part of the day, the same for everyone: registration, coffee, lunch, the
    after-party. Not pickable, so no + and a quieter surface than a talk card. Just the

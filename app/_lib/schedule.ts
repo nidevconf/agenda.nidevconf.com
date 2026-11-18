@@ -1,3 +1,4 @@
+import bands from "../_data/bands.json";
 import talks from "../_data/talks.json";
 
 /* The day's shared vocabulary: which sessions are on, the rooms in order, how a time
@@ -8,6 +9,21 @@ export type Session = (typeof talks)[number];
 // withdrawn talks stay in talks.json (so later talks keep their bit index in a share
 // link) but are never shown
 export const LIVE = talks.filter((t) => !t.withdrawn);
+
+/* The parts of the day that are the same for everyone (registration, lunch, the
+   after-party), plus "Coming soon" placeholders (tba) for talk slots not filled yet.
+   Typed by hand: what the synced file holds changes, e.g. it has no tba once every
+   slot is filled. */
+export type Band = {
+  start: number;
+  end: number;
+  title: string;
+  track?: string;
+  tba?: boolean;
+  layout?: number[];
+  details?: { text: string; href?: string }[];
+};
+export const BANDS: Band[] = bands;
 
 export const TRACKS = ["Hall 1A", "Hall 1B", "Room 1A", "Room 1B", "Room 2A"];
 

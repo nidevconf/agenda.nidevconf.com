@@ -1,18 +1,16 @@
 import type { CSSProperties } from "react";
-import bands from "../_data/bands.json";
-import { byTime, clock, LIVE, TRACKS, when } from "../_lib/schedule";
+import { BANDS, type Band, byTime, clock, LIVE, TRACKS, when } from "../_lib/schedule";
 import TalkCard from "./TalkCard";
 
 /* Desktop: the whole day as nidevconf.com's homepage timetable draws it — a
    copy of its Schedule.tsx Grid, fed from the synced snapshot. Picked talks
    wear the ink fill; the plus on each card is how you pick. */
 
-type Band = (typeof bands)[number];
 type Talk = (typeof LIVE)[number];
 type Item = { start: number; end: number; track?: string; layout?: number[]; band?: Band; talk?: Talk };
 
 const items: Item[] = [
-  ...bands.map((b) => ({ start: b.start, end: b.end, track: b.track, layout: b.layout, band: b })),
+  ...BANDS.map((b) => ({ start: b.start, end: b.end, track: b.track, layout: b.layout, band: b })),
   ...LIVE.map((t) => ({ start: t.start, end: t.end, track: t.track, talk: t })),
 ].sort(byTime);
 
