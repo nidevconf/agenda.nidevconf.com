@@ -3,6 +3,7 @@
 import { Check, Plus } from "lucide-react";
 import { createContext, useContext } from "react";
 import talks from "../_data/talks.json";
+import { overlaps } from "../_lib/schedule";
 import { usePicksApi } from "../_lib/picks";
 
 type Slot = { id: string; title: string; start: number; end: number };
@@ -24,7 +25,7 @@ export default function AddToAgenda({ talk, swap }: { talk: Slot; swap?: boolean
   function onClick() {
     if (!picked && !swap && guard?.(talk)) return;
     if (!swap || picked) return toggle(talk.id);
-    const overlapping = (id: string) => talks.some((t) => t.id === id && t.start < talk.end && talk.start < t.end);
+    const overlapping = (id: string) => talks.some((t) => t.id === id && overlaps(t, talk));
     setPicks([...picks.filter((id) => !overlapping(id)), talk.id]);
   }
 

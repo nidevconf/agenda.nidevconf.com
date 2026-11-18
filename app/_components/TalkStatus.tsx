@@ -1,19 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import talks from "../_data/talks.json";
 import { usePicksApi } from "../_lib/picks";
+import { LIVE, noun as nounOf, overlaps } from "../_lib/schedule";
 import Sheet from "./Sheet";
 import TalkCard from "./TalkCard";
 
 type Slot = { id: string; start: number; end: number; format: string };
 
-const NOUN: Record<string, string> = {
-  Talk: "talk",
-  Lightning: "lightning talk",
-  Workshop: "workshop",
-};
-const live = talks.filter((t) => !t.withdrawn);
 
 /* Where this talk stands against your agenda — going, going but clashing, or
    you'll miss it because you picked something else at that time. Always one
@@ -35,13 +29,9 @@ export default function TalkStatus({
   plain?: boolean;
 }) {
   const { picks } = usePicksApi();
-  const noun = NOUN[talk.format] ?? "session";
-  const others = live.filter(
-    (t) =>
-      t.id !== talk.id &&
-      picks.includes(t.id) &&
-      t.start < talk.end &&
-      talk.start < t.end,
+  const noun = nounOf(talk.format);
+  const others = LIVE.filter(
+    (t) => t.id !== talk.id && picks.includes(t.id) && overlaps(t, talk),
   );
   const going = picks.includes(talk.id);
   const state = going
@@ -51,7 +41,7 @@ export default function TalkStatus({
     : others.length
       ? "miss"
       : "open";
-  const group = live.filter(
+  const group = LIVE.filter(
     (t) => t.id === talk.id || others.some((o) => o.id === t.id),
   );
   const [snap, setSnap] = useState<string[] | null>(null);
@@ -89,7 +79,7 @@ export default function TalkStatus({
       {!plain && snap && (
         <Sheet title="Choose a session" onClose={() => setSnap(null)}>
           <ul>
-            {live
+            {LIVE
               .filter((t) => snap.includes(t.id))
               .sort((a, b) => a.start - b.start)
               .map((t) => (

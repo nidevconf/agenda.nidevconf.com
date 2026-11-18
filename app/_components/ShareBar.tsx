@@ -4,19 +4,9 @@ import qrcode from "qrcode-generator";
 import { useState } from "react";
 import talks from "../_data/talks.json";
 import { encodeAgenda } from "../_lib/agenda-code";
-import { setName, useName } from "../_lib/picks";
+import { useName } from "../_lib/picks";
+import NameField from "./NameField";
 import Sheet from "./Sheet";
-
-/* Your name, kept on this device; it goes into the link you share. */
-export function NameField() {
-  const name = useName();
-  return (
-    <label className="field">
-      <span>Name (optional)</span>
-      <input type="text" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
-    </label>
-  );
-}
 
 /* Turns your picks into a link (?name=<you>&agenda=<hex bitset>; the name only if you
    gave one) and shows it in a sheet: your name, a QR code to scan off your screen, and

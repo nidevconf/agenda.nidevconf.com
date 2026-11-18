@@ -140,10 +140,17 @@ const ITEMS = [
 ];
 ITEMS.sort((a, b) => a.start - b.start || (a.track ?? -1) - (b.track ?? -1));
 
+// Everything in talks.json ships to the browser, so copy only the fields the app shows,
+// named one by one: a field added upstream (a speaker's email, say) never rides along.
+const publicFields = ({ id, slug, title, description, format, minutes, level, topics, chip, speakers = [] }) => ({
+  id, slug, title, description, format, minutes, level, topics, chip,
+  speakers: speakers.map(({ name, tagline, bio, photo }) => ({ name, tagline, bio, photo })),
+});
+
 const placedById = new Map(
   ITEMS.filter((i) => i.session).map((i) => [
     i.session.id,
-    { ...i.session, start: i.start, end: i.end, track: TRACKS[i.track], withdrawn: false },
+    { ...publicFields(i.session), start: i.start, end: i.end, track: TRACKS[i.track], withdrawn: false },
   ]),
 );
 
@@ -167,7 +174,9 @@ const existing = existsSync(existingPath) ? JSON.parse(readFileSync(existingPath
 const merged = existing.map((old) => {
   const fresh = placedById.get(old.id);
   placedById.delete(old.id);
-  return fresh ?? { ...old, withdrawn: true };
+  // a withdrawn talk keeps only its place (its id, for the share links' bit order) and
+  // its shape; who it was and what it was about don't stay in the public bundle
+  return fresh ?? { ...old, slug: "", title: "", description: "", topics: [], chip: "", speakers: [], withdrawn: true };
 });
 const added = [...placedById.values()]; // whatever's left is new -> appended
 const talks = [...merged, ...added];

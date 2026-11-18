@@ -40,11 +40,6 @@ function parsePicks(raw: string | null): string[] {
   }
 }
 
-/** The saved picks right now, read straight from storage (not a render snapshot). */
-export function readPicks() {
-  return parsePicks(readRaw(PICKS_KEY));
-}
-
 export function usePicks() {
   const raw = useSyncExternalStore(subscribe, () => readRaw(PICKS_KEY), () => null);
   return useMemo(() => parsePicks(raw), [raw]);
@@ -61,11 +56,6 @@ export function setPicks(ids: string[]) {
     return; // storage blocked: nothing saved, nothing to notify
   }
   notify();
-}
-
-export function toggle(id: string) {
-  const ids = parsePicks(readRaw(PICKS_KEY));
-  setPicks(ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]);
 }
 
 /* A stand-in agenda for previews (the /design library): inside one, reads and writes

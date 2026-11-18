@@ -1,8 +1,8 @@
 import talks from "../_data/talks.json";
 import SpeakerByline from "./SpeakerByline";
-import TalkCard, { clock } from "./TalkCard";
+import { byTime, clock } from "../_lib/schedule";
+import TalkCard from "./TalkCard";
 
-const TRACKS = ["Hall 1A", "Hall 1B", "Room 1A", "Room 1B", "Room 2A"];
 type Talk = (typeof talks)[number];
 
 /* Sessions in running order, grouped by start time. Each one is the talk card (with its
@@ -42,7 +42,7 @@ function SessionBody({ description, speakers }: { description: string; speakers:
 export default function SessionList({ filter = () => true }: { filter?: (t: Talk) => boolean }) {
   const sorted = talks
     .filter((t) => !t.withdrawn && filter(t))
-    .sort((a, b) => a.start - b.start || TRACKS.indexOf(a.track) - TRACKS.indexOf(b.track));
+    .sort(byTime);
   const slots = [...new Set(sorted.map((t) => t.start))];
 
   return slots.map((start) => (

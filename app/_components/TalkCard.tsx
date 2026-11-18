@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import type { CSSProperties } from "react";
 import Link from "next/link";
+import { when } from "../_lib/schedule";
 import { slugify } from "../_lib/speakers";
 import AddToAgenda from "./AddToAgenda";
 import TalkStatus from "./TalkStatus";
@@ -16,15 +17,6 @@ export type Talk = {
   speakers?: { name: string; photo: string }[];
 };
 
-export const clock = (m: number) =>
-  `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
-
-export function duration(minutes: number) {
-  if (minutes < 60) return `${minutes} minutes`;
-  const h = Math.round((minutes / 60) * 10) / 10;
-  return `${h} hour${h > 1 ? "s" : ""}`;
-}
-
 export const talkHref = (t: Pick<Talk, "format" | "slug">) =>
   `/${t.format === "Workshop" ? "workshops" : "talks"}#${t.slug}`;
 
@@ -36,7 +28,6 @@ export default function TalkCard({
   talk,
   speakers = true,
   action = "add",
-  clashNote,
   style,
   picked,
   status,
@@ -48,7 +39,6 @@ export default function TalkCard({
   speakers?: boolean;
   /** "none" while previewing someone else's agenda: the plus would edit yours */
   action?: "add" | "none";
-  clashNote?: string;
   /** desktop grid placement (--c/--r1/--r2) */
   style?: CSSProperties;
   /** highlighted in the desktop grid */
@@ -65,14 +55,13 @@ export default function TalkCard({
   return (
     <Tag
       className={`ag-item ag-talk${flash ? " ag-flash" : ""}${who.length ? "" : " ag-solo"}`}
-      data-clash={clashNote ? "" : undefined}
       data-picked={picked ? "" : undefined}
       style={style}
     >
       <span className="ag-top">
         <span className="ag-track">{talk.track}</span>
         <span className="ag-when">
-          {clock(talk.start)} ({duration(talk.end - talk.start)})
+          {when(talk)}
         </span>
       </span>
       {who.length > 0 && (
@@ -97,7 +86,6 @@ export default function TalkCard({
       </Link>
       {action === "add" && <AddToAgenda talk={talk} swap={swap} />}
       {status && <TalkStatus talk={talk} plain={status === "plain"} />}
-      {clashNote && <span className="my-clash">{clashNote}</span>}
     </Tag>
   );
 }

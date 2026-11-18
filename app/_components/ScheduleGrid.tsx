@@ -1,22 +1,20 @@
 import type { CSSProperties } from "react";
 import bands from "../_data/bands.json";
-import talks from "../_data/talks.json";
-import TalkCard, { clock, duration } from "./TalkCard";
+import { byTime, clock, LIVE, TRACKS, when } from "../_lib/schedule";
+import TalkCard from "./TalkCard";
 
 /* Desktop: the whole day as nidevconf.com's homepage timetable draws it — a
    copy of its Schedule.tsx Grid, fed from the synced snapshot. Picked talks
    wear the ink fill; the plus on each card is how you pick. */
 
-const TRACKS = ["Hall 1A", "Hall 1B", "Room 1A", "Room 1B", "Room 2A"];
-
 type Band = (typeof bands)[number];
-type Talk = (typeof talks)[number];
+type Talk = (typeof LIVE)[number];
 type Item = { start: number; end: number; track?: string; layout?: number[]; band?: Band; talk?: Talk };
 
 const items: Item[] = [
   ...bands.map((b) => ({ start: b.start, end: b.end, track: b.track, layout: b.layout, band: b })),
-  ...talks.filter((t) => !t.withdrawn).map((t) => ({ start: t.start, end: t.end, track: t.track, talk: t })),
-].sort((a, b) => a.start - b.start || TRACKS.indexOf(a.track ?? "") - TRACKS.indexOf(b.track ?? ""));
+  ...LIVE.map((t) => ({ start: t.start, end: t.end, track: t.track, talk: t })),
+].sort(byTime);
 
 // same emoji deal as the main site: stepping 13 through 40 gives every empty slot its own face
 const FACES = [
@@ -28,7 +26,6 @@ const FACES = [
 const FACE_OF = new Map(items.filter((i) => i.band?.tba).map((i, n) => [i, FACES[(n * 13) % FACES.length]]));
 
 const span = (i: Item) => (i.layout ?? [i.start, i.end]) as [number, number];
-const whenOf = (i: Item) => `${clock(i.start)} (${duration(i.end - i.start)})`;
 
 // every start and end is a grid line; each row is as tall as its minutes
 const lines = [...new Set(items.flatMap(span))].sort((a, b) => a - b);
@@ -81,14 +78,14 @@ export default function ScheduleGrid({ picked, previewing }: { picked: Set<strin
                   {FACE_OF.get(item)}
                 </span>
                 <span className="ag-who">Coming soon</span>
-                <span className="ag-when">{whenOf(item)}</span>
+                <span className="ag-when">{when(item)}</span>
               </li>
             );
           }
           return (
             <li key={key} className="ag-item ag-band" style={style}>
               <p className="ag-title">{b.title}</p>
-              <p className="ag-when">{whenOf(item)}</p>
+              <p className="ag-when">{when(item)}</p>
             </li>
           );
         })}

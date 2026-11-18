@@ -1,21 +1,20 @@
 "use client";
 
-import bands from "../_data/bands.json";
-import talks from "../_data/talks.json";
 import Link from "next/link";
+import bands from "../_data/bands.json";
+import { LIVE, overlaps, when } from "../_lib/schedule";
 import { talkStep } from "./AgendaBuilder";
 import BandCard from "./BandCard";
-import TalkCard, { clock, duration } from "./TalkCard";
+import TalkCard from "./TalkCard";
 
-const live = talks.filter((t) => !t.withdrawn);
 const FIXED = bands.filter((b) => !b.tba); // "Coming soon" placeholders left out
 // the talk slots: when the 30-minute talks start, and when they end
 const SLOTS = [
-  ...new Set(live.filter((t) => t.format === "Talk").map((t) => t.start)),
+  ...new Set(LIVE.filter((t) => t.format === "Talk").map((t) => t.start)),
 ].map((start) => ({
   start,
   end: Math.max(
-    ...live
+    ...LIVE
       .filter((t) => t.format === "Talk" && t.start === start)
       .map((t) => t.end),
   ),
@@ -25,9 +24,9 @@ const SLOTS = [
    the same for everyone (registration, lunch, the after-party), in order of when each
    starts. A workshop that runs into lunch starts first, so it's listed first. Cards carry
    no status and no + here: this is the plan to read, and the builder is where you
-   change it. A talk slot with nothing in it
-   (nothing picked there, and nothing picked running through it) shows as a dashed, empty
-   card that opens the builder at that slot. */
+   change it. A talk slot with nothing in it (nothing picked there, and nothing picked
+   running through it) shows as a dashed, empty card that opens that slot's question on
+   its own (/agenda/choose). */
 export default function DayList({
   ids,
   readOnly,
@@ -41,8 +40,7 @@ export default function DayList({
       band: true,
       el: <BandCard key={`band-${b.start}`} band={b} />,
     })),
-    ...live
-      .filter((t) => ids.includes(t.id))
+    ...LIVE.filter((t) => ids.includes(t.id))
       .map((t) => ({
         start: t.start,
         band: false,
@@ -51,9 +49,7 @@ export default function DayList({
     ...(readOnly ? [] : SLOTS)
       .filter(
         (sl) =>
-          !live.some(
-            (t) => ids.includes(t.id) && t.start < sl.end && sl.start < t.end,
-          ),
+          !LIVE.some((t) => ids.includes(t.id) && overlaps(t, sl)),
       )
       .map((sl) => ({
         start: sl.start,
@@ -67,7 +63,7 @@ export default function DayList({
               Choose a talk to go to
             </Link>
             <p className="ag-when">
-              {clock(sl.start)} ({duration(sl.end - sl.start)})
+              {when(sl)}
             </p>
           </li>
         ),

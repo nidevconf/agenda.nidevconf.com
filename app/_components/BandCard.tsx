@@ -1,4 +1,4 @@
-import { clock, duration } from "./TalkCard";
+import { when } from "../_lib/schedule";
 
 export type Band = { start: number; end: number; title: string; track?: string };
 
@@ -14,7 +14,7 @@ export default function BandCard({ band: b }: { band: Band }) {
         {b.track && ` · ${b.track}`}
       </p>
       <p className="ag-when">
-        {clock(b.start)} ({duration(b.end - b.start)})
+        {when(b)}
       </p>
     </li>
   );

@@ -11,9 +11,11 @@ import {
   usePicks,
   useQueryParam,
 } from "../_lib/picks";
+import { LIVE } from "../_lib/schedule";
 import DayList from "./DayList";
 import ScheduleGrid from "./ScheduleGrid";
-import ShareBar, { NameField } from "./ShareBar";
+import NameField from "./NameField";
+import ShareBar from "./ShareBar";
 
 /* Your day: what you've picked and the fixed parts of the day (DayList), in
    time order; picking happens in the agenda builder (/agenda/build). A shared link previews someone
@@ -30,14 +32,12 @@ export default function AgendaDay() {
   const sharedName = useQueryParam("name");
 
   // decodeAgenda needs the FULL array (withdrawn talks included) so bit
-  // positions line up; everything below that's actually displayed uses the
-  // live subset instead.
-  const liveTalks = talks.filter((t) => !t.withdrawn);
+  // positions line up; everything below that's actually displayed uses LIVE.
   const sharedIds = sharedHex ? decodeAgenda(sharedHex, talks) : null;
   const previewing = sharedIds !== null && sharedIds.length > 0;
 
   const idsSet = new Set(previewing ? sharedIds! : myPicks);
-  const picked = liveTalks.filter((t) => idsSet.has(t.id));
+  const picked = LIVE.filter((t) => idsSet.has(t.id));
 
   function adopt() {
     setPicks(sharedIds!);
