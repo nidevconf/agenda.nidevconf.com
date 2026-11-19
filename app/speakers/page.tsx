@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import DeckUrl from "../_components/DeckUrl";
 import SpeakerCard from "../_components/SpeakerCard";
 import { SPEAKERS } from "../_lib/speakers";
 
@@ -13,6 +14,7 @@ export default function SpeakersPage() {
   return (
     <div className="deck">
       <h1 className="sr-only">Speakers</h1>
+      <DeckUrl />
       {sorted.map((s) => (
         <article key={s.slug} id={s.slug} className="deck-card">
           <SpeakerCard speaker={s} />

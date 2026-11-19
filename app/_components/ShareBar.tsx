@@ -4,6 +4,7 @@ import qrcode from "qrcode-generator";
 import { useState } from "react";
 import talks from "../_data/talks.json";
 import { encodeAgenda } from "../_lib/agenda-code";
+import { useCopyToClipboard } from "../_lib/clipboard";
 import { useName } from "../_lib/picks";
 import NameField from "./NameField";
 import Sheet from "./Sheet";
@@ -14,7 +15,7 @@ import Sheet from "./Sheet";
 export default function ShareBar({ picks }: { picks: string[] }) {
   const name = useName().trim();
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useCopyToClipboard();
 
   if (picks.length === 0) return null;
 
@@ -22,13 +23,6 @@ export default function ShareBar({ picks }: { picks: string[] }) {
   if (name) q.set("name", name);
   q.set("agenda", encodeAgenda(picks, talks));
   const url = open ? `${location.origin}${location.pathname}?${q}` : "";
-
-  function copy() {
-    navigator.clipboard?.writeText(url).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  }
 
   return (
     <>
@@ -50,7 +44,7 @@ export default function ShareBar({ picks }: { picks: string[] }) {
               aria-label="Link to your agenda"
               onFocus={(e) => e.target.select()}
             />
-            <button type="button" className="btn btn-primary" onClick={copy}>
+            <button type="button" className="btn btn-primary" onClick={() => copy(url)}>
               {copied ? "Copied" : "Copy"}
             </button>
           </div>

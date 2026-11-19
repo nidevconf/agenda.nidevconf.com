@@ -1,10 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import TalkCard from "../../_components/TalkCard";
-import talks from "../../_data/talks.json";
-import { large } from "../../_lib/photos";
+import SpeakerCard from "../../_components/SpeakerCard";
 import { SPEAKERS, speakerBySlug } from "../../_lib/speakers";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -42,23 +38,11 @@ export default async function SpeakerPage({ params }: Params) {
   if (!s) notFound();
 
   return (
-    <div className="speaker-page wrap">
-      <Link href="/agenda" className="back-link">
-        ← My agenda
-      </Link>
-      <img className="speaker-photo" src={`/images/speakers/${large(s.photo)}`} alt={s.name} width={320} height={320} />
-      <h1 className="speaker-name">{s.name}</h1>
-      <p className="speaker-tagline">{s.tagline}</p>
-
-      <ul className="speaker-talk">
-        {/* faces only when it's shared: the speaker alone is already the page */}
-        <TalkCard talk={talks.find((t) => t.id === s.talk.id)!} speakers={s.talk.coSpeakers.length > 0} />
-      </ul>
-      <p className="speaker-desc">{s.talk.description}</p>
-
-      <div className="speaker-bio">
-        <p>{s.bio}</p>
-      </div>
+    <div className="deck">
+      <h1 className="sr-only">{s.name}</h1>
+      <article id={s.slug} className="deck-card">
+        <SpeakerCard speaker={s} />
+      </article>
     </div>
   );
 }
