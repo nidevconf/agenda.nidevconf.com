@@ -1,6 +1,6 @@
 "use client";
 
-import { BANDS, LIVE, overlaps, SLOTS } from "../_lib/schedule";
+import { BANDS, freeSlots, LIVE } from "../_lib/schedule";
 import BandCard from "./BandCard";
 import FreeSlotCard from "./FreeSlotCard";
 import TalkCard from "./TalkCard";
@@ -31,12 +31,7 @@ export default function DayList({
         band: false,
         el: <TalkCard key={t.id} talk={t} action={readOnly ? "none" : "add"} />,
       })),
-    ...(readOnly ? [] : SLOTS)
-      .filter(
-        (sl) =>
-          !LIVE.some((t) => ids.includes(t.id) && overlaps(t, sl)),
-      )
-      .map((sl) => ({
+    ...(readOnly ? [] : freeSlots(ids)).map((sl) => ({
         start: sl.start,
         band: false,
         el: <FreeSlotCard key={`free-${sl.start}`} slot={sl} />,

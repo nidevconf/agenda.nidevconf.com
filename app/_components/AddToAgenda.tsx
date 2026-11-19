@@ -49,9 +49,8 @@ export default function AddToAgenda({ talk, swap }: { talk: Pickable; swap?: boo
   );
 }
 
-/* The same control as a full-width labelled button (the details sheet), naming what it
-   adds: `what` is "this talk", "this workshop"… */
-export function AddToAgendaWide({ talk, what }: { talk: Pickable; what: string }) {
+// the label leaves out what it adds (the sheet's title says it) so it fits beside "View details" on a phone
+export function AddToAgendaLabelled({ talk }: { talk: Pickable }) {
   const { picked, onClick } = useAddToAgenda(talk);
   return (
     <button
@@ -60,8 +59,8 @@ export function AddToAgendaWide({ talk, what }: { talk: Pickable; what: string }
       aria-pressed={picked}
       onClick={onClick}
     >
-      {picked ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
-      {picked ? `On your agenda · remove` : `Add ${what} to my agenda`}
+      {picked && <Check size={18} aria-hidden />}
+      {picked ? "On my agenda" : "Add to my agenda"}
     </button>
   );
 }

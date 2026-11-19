@@ -1,13 +1,19 @@
+import Link from "next/link";
 import { createPortal } from "react-dom";
 import talks from "../_data/talks.json";
-import { noun, when } from "../_lib/schedule";
-import { AddToAgendaWide } from "./AddToAgenda";
+import { when } from "../_lib/schedule";
+import { AddToAgendaLabelled } from "./AddToAgenda";
 import { SessionBody, SessionTags } from "./SessionWriteup";
 import Sheet from "./Sheet";
 
+type Session = (typeof talks)[number];
+
+// ponytail: the session on its list page until each talk has a page of its own; then /talks/<slug>
+const sessionPage = (s: Session) => `/${s.format === "Workshop" ? "workshops" : "talks"}#${s.slug}`;
+
 export type TalkDetailsViewProps = {
   title: string;
-  session: (typeof talks)[number];
+  session: Session;
   open: boolean;
   /** "add": the sheet ends with a button putting the session on your agenda */
   action: "add" | "none";
@@ -33,7 +39,12 @@ export default function TalkDetailsView({ title, session: s, open, action, onOpe
               <SessionTags s={s} />
               <SessionBody description={s.description} speakers={s.speakers} />
             </div>
-            {action === "add" && <AddToAgendaWide talk={s} what={`this ${noun(s.format)}`} />}
+            <div className="sheet-actions">
+              <Link className="btn btn-ghost" href={sessionPage(s)}>
+                View details
+              </Link>
+              {action === "add" && <AddToAgendaLabelled talk={s} />}
+            </div>
           </Sheet>,
           document.body,
         )}

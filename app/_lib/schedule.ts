@@ -75,6 +75,9 @@ export const SLOTS: Slot[] = starts.map((start, i) => {
     sessions,
   };
 });
+export const freeSlots = (picks: string[]) =>
+  SLOTS.filter((sl) => !LIVE.some((t) => picks.includes(t.id) && overlaps(t, sl)));
+
 // every session in at least one slot, or some of the day can't be picked (that bug: workshops
 // and lightning talks were left off the agenda). Breaks the build rather than the page.
 if (LIVE.some((t) => !SLOTS.some((s) => s.sessions.includes(t))))

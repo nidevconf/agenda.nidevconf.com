@@ -11,7 +11,7 @@ import {
   usePicks,
   useQueryParam,
 } from "../_lib/picks";
-import { LIVE } from "../_lib/schedule";
+import { freeSlots } from "../_lib/schedule";
 import DayList from "./DayList";
 import ScheduleGrid from "./ScheduleGrid";
 import NameField from "./NameField";
@@ -31,13 +31,12 @@ export default function AgendaDay() {
   const sharedHex = useQueryParam("agenda");
   const sharedName = useQueryParam("name");
 
-  // decodeAgenda needs the FULL array (withdrawn talks included) so bit
-  // positions line up; everything below that's actually displayed uses LIVE.
+  // decodeAgenda needs the FULL array (withdrawn talks included) so bit positions line up
   const sharedIds = sharedHex ? decodeAgenda(sharedHex, talks) : null;
   const previewing = sharedIds !== null && sharedIds.length > 0;
 
   const idsSet = new Set(previewing ? sharedIds! : myPicks);
-  const picked = LIVE.filter((t) => idsSet.has(t.id));
+  const hasGaps = freeSlots(myPicks).length > 0;
 
   function adopt() {
     setPicks(sharedIds!);
@@ -61,6 +60,11 @@ export default function AgendaDay() {
           <div className="name-row">
             <NameField />
             <ShareBar picks={myPicks} />
+            {hasGaps && (
+              <Link className="btn btn-primary my-build" href="/agenda/build">
+                Build my agenda
+              </Link>
+            )}
           </div>
         )}
       </div>
@@ -103,13 +107,6 @@ export default function AgendaDay() {
 
       {/* phones: your day as a list (the same one the agenda builder ends on) */}
       <div className="agenda-list">
-        {picked.length === 0 && !previewing && (
-          <p className="my-empty">
-            Nothing on your agenda yet. Talks, workshops and lightning talks
-            are all on below, slot by slot, or{" "}
-            <Link href="/agenda/build">build it step by step</Link>.
-          </p>
-        )}
         {/* previewing someone else's: their picks drive the colours, and nothing can be edited */}
         <PicksOverride
           value={previewing ? { picks: sharedIds!, setPicks: () => {} } : null}
