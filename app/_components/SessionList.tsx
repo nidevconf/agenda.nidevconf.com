@@ -1,5 +1,5 @@
 import talks from "../_data/talks.json";
-import { SessionBody, SessionTags } from "./TalkDetails";
+import { SessionBody, SessionTags } from "./SessionWriteup";
 import { byTime, clock } from "../_lib/schedule";
 import TalkCard from "./TalkCard";
 

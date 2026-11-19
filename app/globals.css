@@ -592,7 +592,7 @@ html:has(.deck) { scroll-snap-type: y mandatory; scroll-padding-top: var(--heade
   .ds-props { display: block; overflow-x: auto; }
 }
 
-/* ---- /agenda/build (AgendaBuilder.tsx): the day as a questionnaire, one slot per step ---- */
+/* ---- /agenda/build (AgendaBuilder) and /agenda/choose (ChooseSlot): the day as a questionnaire, a step at a time ---- */
 /* fills the screen under the site header, so Skip/Next sits at the foot */
 .builder-page { padding: var(--s1) 20px 0; }
 .builder { margin-top: 0; min-height: calc(100svh - var(--header-h) - var(--s1)); display: flex; flex-direction: column; }
@@ -613,7 +613,7 @@ html:has(.deck) { scroll-snap-type: y mandatory; scroll-padding-top: var(--heade
 /* lunch and the afternoon break: no choices, a heading and a line, centred in the space
    between the progress and the buttons */
 .builder-break { display: grid; place-content: center; gap: var(--s15); text-align: center; padding: var(--s4) 0; }
-/* the two emoji, sized and placed in reference px (AgendaBuilder's PAUSES). --u is one of
+/* the two emoji, sized and placed in reference px (PAUSES in _lib/builder.ts). --u is one of
    those px: 1px wherever the pair fits, less on a phone narrower than it plus the margins */
 .builder-break-art { --u: min(1px, (100vw - 40px) / var(--art-w)); display: flex; justify-content: center; align-items: flex-start; gap: calc(var(--gap) * var(--u)); margin-bottom: calc(44 * var(--u)); }
 .builder-break-art img { width: calc(var(--w) * var(--u)); height: auto; margin-top: calc(var(--top) * var(--u)); rotate: var(--tilt); }
@@ -637,14 +637,15 @@ html:has(.deck) { scroll-snap-type: y mandatory; scroll-padding-top: var(--heade
 /* every card the same height: the title always takes two lines, the rest are one line each */
 :is(.builder, .day-list) .ag-talk .ag-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; height: calc(2 * 1.3em); }
 .builder-actions { position: sticky; bottom: 0; z-index: 5; display: flex; align-items: center; gap: var(--s1); margin-top: var(--s2); padding: var(--s1) 0 calc(var(--s15) + env(safe-area-inset-bottom)); background: var(--bg); }
-.builder-spacer { flex: 1; }
+/* the step's main action sits at the right, whether or not Previous is there */
+.builder-actions > :last-child { margin-inline-start: auto; }
 /* the day list (DayList.tsx, on /agenda): the fixed parts of the day are the same height
    as the talk cards, whatever their length, so the list reads as an even column */
 .day-list { display: grid; gap: var(--s1); }
 .day-list > :is(.ag-band, .ag-free) { min-height: 97px; justify-content: flex-start; }
 @media (prefers-reduced-motion: reduce) { .builder-bar button::before { transition: none; } }
 
-/* the card title as a button (TalkDetails.tsx): reads as the title, opens the details sheet */
+/* the card title as a button (TalkDetailsView.tsx): reads as the title, opens the details sheet */
 button.ag-title { padding: 0; border: 0; background: none; text-align: left; cursor: pointer; }
 /* the details sheet: the /talks write-up, inside the sheet's own padding */
 .details { max-height: 60dvh; overflow-y: auto; margin-top: var(--s15); }
