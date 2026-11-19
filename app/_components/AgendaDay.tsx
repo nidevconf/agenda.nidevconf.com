@@ -105,8 +105,9 @@ export default function AgendaDay() {
       <div className="agenda-list">
         {picked.length === 0 && !previewing && (
           <p className="my-empty">
-            Nothing on your agenda yet.{" "}
-            <Link href="/agenda/build">Build it step by step</Link>.
+            Nothing on your agenda yet. Talks, workshops and lightning talks
+            are all on below, slot by slot, or{" "}
+            <Link href="/agenda/build">build it step by step</Link>.
           </p>
         )}
         {/* previewing someone else's: their picks drive the colours, and nothing can be edited */}

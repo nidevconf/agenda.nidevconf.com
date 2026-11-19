@@ -4,6 +4,7 @@ import Link from "next/link";
 import { when } from "../_lib/schedule";
 import { slugify } from "../_lib/speakers";
 import AddToAgenda from "./AddToAgenda";
+import TalkDetails from "./TalkDetails";
 import TalkStatus from "./TalkStatus";
 
 export type Talk = {
@@ -17,13 +18,11 @@ export type Talk = {
   speakers?: { name: string; photo: string }[];
 };
 
-export const talkHref = (t: Pick<Talk, "format" | "slug">) =>
-  `/${t.format === "Workshop" ? "workshops" : "talks"}#${t.slug}`;
-
 /* THE talk card — the agenda list, the desktop grid, the speaker tiles and a
    speaker's page all draw a talk with this, so it reads (and works) the same
-   everywhere: room + time, who, the title. Tap the card to find out more (the
-   title's link stretches over it); tap the plus to put it on your agenda. */
+   everywhere: room + time, who, the title. Tap the card to find out more, in a sheet
+   over wherever you are (the title's button stretches over it); tap the plus to put it
+   on your agenda. */
 export default function TalkCard({
   talk,
   speakers = true,
@@ -32,6 +31,7 @@ export default function TalkCard({
   picked,
   status,
   swap,
+  details = true,
   as: Tag = "li",
 }: {
   talk: Talk;
@@ -48,6 +48,8 @@ export default function TalkCard({
   status?: boolean | "plain";
   /** the + also drops whatever you'd picked at the same time (the clash sheet) */
   swap?: boolean;
+  /** off where the details are already on screen (/talks, /workshops) */
+  details?: boolean;
   as?: "li" | "div";
 }) {
   const flash = talk.end - talk.start < 30;
@@ -81,9 +83,11 @@ export default function TalkCard({
           </span>
         </>
       )}
-      <Link className="ag-title ag-link" href={talkHref(talk)}>
-        {talk.title}
-      </Link>
+      {details ? (
+        <TalkDetails id={talk.id} title={talk.title} action={action} />
+      ) : (
+        <span className="ag-title">{talk.title}</span>
+      )}
       {action === "add" && <AddToAgenda talk={talk} swap={swap} />}
       {status && <TalkStatus talk={talk} plain={status === "plain"} />}
     </Tag>

@@ -45,6 +45,9 @@ export function usePicks() {
   return useMemo(() => parsePicks(raw), [raw]);
 }
 
+/** The picks right now, outside React (where a hook's first render would still say none). */
+export const readPicks = () => parsePicks(readRaw(PICKS_KEY));
+
 export function useName() {
   return useSyncExternalStore(subscribe, () => readRaw(NAME_KEY) ?? "", () => "");
 }

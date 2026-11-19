@@ -16,7 +16,8 @@ export const AddGuard = createContext<((talk: Slot) => boolean) | null>(null);
 /* The one control that puts a talk on your agenda, everywhere: a round plus that
    turns into a tick once it's on. With `swap`, adding a talk also drops anything
    you'd picked at the same time (the clash sheet). */
-export default function AddToAgenda({ talk, swap }: { talk: Slot; swap?: boolean }) {
+/* `wide`: a full-width labelled button instead (the details sheet), naming what it adds. */
+export default function AddToAgenda({ talk, swap, wide }: { talk: Slot; swap?: boolean; wide?: string }) {
   const { picks, setPicks, toggle } = usePicksApi();
   const guard = useContext(AddGuard);
   const picked = picks.includes(talk.id);
@@ -29,6 +30,18 @@ export default function AddToAgenda({ talk, swap }: { talk: Slot; swap?: boolean
     setPicks([...picks.filter((id) => !overlapping(id)), talk.id]);
   }
 
+  if (wide)
+    return (
+      <button
+        type="button"
+        className={`btn ${picked ? "btn-secondary" : "btn-primary"} sheet-action`}
+        aria-pressed={picked}
+        onClick={onClick}
+      >
+        {picked ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
+        {picked ? `On your agenda · remove` : `Add ${wide} to my agenda`}
+      </button>
+    );
   return (
     <button type="button" className="fav" aria-pressed={picked} aria-label={action} title={action} onClick={onClick}>
       {picked ? <Check size={22} aria-hidden /> : <Plus size={22} aria-hidden />}

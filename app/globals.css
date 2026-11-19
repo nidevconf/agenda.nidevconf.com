@@ -134,7 +134,6 @@ button { font: inherit; }
 .btn-outline { background: transparent; color: var(--ink); border-color: var(--glass-line); }
 .btn-outline:is(:hover, .is-hover) { background: var(--bg-2); border-color: var(--ink); }
 .btn-ghost { background: transparent; color: var(--ink); }
-.btn-ghost:is(:hover, .is-hover) { background: var(--bg-3); }
 .btn-destructive { background: var(--danger); color: var(--on-state); }
 .btn-destructive:is(:hover, .is-hover) { background: var(--danger-hover); }
 .btn-link { background: none; color: var(--ink); padding-inline: 0; text-decoration: underline; text-underline-offset: 3px; }
@@ -415,10 +414,10 @@ html:has(.deck) { scroll-snap-type: y mandatory; scroll-padding-top: var(--heade
 .hero h1 { font-size: clamp(40px, 7.4vw, 82px); line-height: 1; font-weight: 500; letter-spacing: -.02em; max-width: 18ch; margin: 0 auto; }
 .hero .for-nerds { margin-top: 22px; font-family: var(--display); font-weight: 500; font-size: clamp(22px, 2.8vw, 30px); line-height: 1.25; }
 .hero-cta { margin-top: 40px; }
-/* the "Build my agenda" badge (TiltBadge): nidevconf.com's yellow badge, recoloured white */
+/* the "Build my agenda" badge (TiltBadge): nidevconf.com's yellow badge */
 .anni-badge{display:inline-flex;align-items:center;gap:10px;font-family:var(--display);
   font-weight:600;font-size:15px;color:#000;
-  background:var(--white);border-radius:var(--r);padding:8px 16px;
+  background:var(--yellow);border-radius:var(--r);padding:8px 16px;
   border:0;cursor:pointer;position:relative;overflow:hidden;
   transition:transform .09s ease-out;}
 /* sheen: a broad band, the reflection of a fixed overhead light on the tilting face.
@@ -441,7 +440,7 @@ html:has(.deck) { scroll-snap-type: y mandatory; scroll-padding-top: var(--heade
 /* confetti: thrown off the pill's outline, decelerating outward, then falling under gravity.
    Two animations so the fade keeps its own timing instead of chopping the fall's easing. */
 .anni-confetti{position:absolute;left:50%;top:50%;width:7px;height:11px;border-radius:1px;
-  background:var(--white);pointer-events:none;
+  background:var(--yellow);pointer-events:none;
   animation:anni-confetti-fly var(--dur) forwards, anni-confetti-fade var(--dur) forwards;}
 @keyframes anni-confetti-fly{
   0%{transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy)))
@@ -456,7 +455,7 @@ html:has(.deck) { scroll-snap-type: y mandatory; scroll-padding-top: var(--heade
 @keyframes anni-confetti-fade{0%,62%{opacity:1;} 100%{opacity:0;}}
 .anni-badge:active{transform:scale(.94);}
 .anni-badge:hover,
-.anni-badge:focus-visible{outline:2px solid var(--white);outline-offset:3px;text-decoration:none;}
+.anni-badge:focus-visible{outline:2px solid var(--yellow);outline-offset:3px;text-decoration:none;}
 .anni-badge.pop{animation:badge-pop .42s ease-out;}
 /* release: two decaying pulses — a big overshoot, then a small one */
 @keyframes badge-pop{
@@ -464,7 +463,7 @@ html:has(.deck) { scroll-snap-type: y mandatory; scroll-padding-top: var(--heade
   82%{transform:scale(1.025);} 100%{transform:scale(1);}
 }
 .anni-badge .n{font-size:16px;}
-/* the global pink selection clashes on white — invert to ink instead */
+/* the global pink selection clashes on yellow — invert to ink instead */
 .anni-badge::selection{background:#121212;color:#fff;}
 @media (prefers-reduced-motion:reduce){
   .anni-badge,.anni-badge-tilt{transform:none!important;}
@@ -600,14 +599,26 @@ html:has(.deck) { scroll-snap-type: y mandatory; scroll-padding-top: var(--heade
 .builder-step { flex: 1; }
 .builder-progress { display: grid; gap: var(--s1); }
 .builder-bar { display: flex; gap: var(--s05); }
-.builder-bar span { flex: 1; height: 4px; border-radius: var(--r-pill); background: var(--bg-3); transition: background var(--t-sheet) var(--ease); }
-.builder-bar span[data-done] { background: var(--ink); }
+/* each segment is a button to its slot: a 4px bar inside a 24px tap target */
+.builder-bar button { position: relative; flex: 1; height: 24px; margin-block: -10px; padding: 0; border: 0; background: none; cursor: pointer; }
+.builder-bar button::before { content: ""; position: absolute; inset: 10px 0; border-radius: var(--r-pill); background: var(--bg-3); transition: background var(--t-sheet) var(--ease); }
+.builder-bar button[data-done]::before { background: var(--ink); }
+.builder-bar button:hover::before { background: var(--muted); }
+.builder-bar button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: var(--r-pill); }
 .builder-progress p { font-family: var(--mono); font-size: var(--fs-time); color: var(--muted); }
 .builder-step { margin: var(--s2) 0 0; padding: 0; border: 0; min-width: 0; }
 .builder-step:focus { outline: none; }
-.builder-step legend { padding: 0; font-family: var(--display); font-weight: var(--fw-semibold); font-size: clamp(20px, 5vw, 26px); line-height: 1.2; }
-.builder-choices { display: grid; gap: var(--s1); margin-top: var(--s2); }
-.builder-step legend + .builder-choices { margin-top: var(--s15); }
+/* the step's question is a screen-reader-only legend, so the choices sit right under the progress */
+.builder-choices { display: grid; gap: var(--s1); }
+/* lunch and the afternoon break: no choices, a heading and a line, centred in the space
+   between the progress and the buttons */
+.builder-break { display: grid; place-content: center; gap: var(--s15); text-align: center; padding: var(--s4) 0; }
+/* the two emoji, sized and placed in reference px (AgendaBuilder's PAUSES). --u is one of
+   those px: 1px wherever the pair fits, less on a phone narrower than it plus the margins */
+.builder-break-art { --u: min(1px, (100vw - 40px) / var(--art-w)); display: flex; justify-content: center; align-items: flex-start; gap: calc(var(--gap) * var(--u)); margin-bottom: calc(44 * var(--u)); }
+.builder-break-art img { width: calc(var(--w) * var(--u)); height: auto; margin-top: calc(var(--top) * var(--u)); rotate: var(--tilt); }
+.builder-break h2 { font-family: var(--display); font-weight: var(--fw-semibold); font-size: clamp(40px, 10vw, 64px); line-height: 1; }
+.builder-break p { max-width: 32ch; margin: var(--s15) auto 0; color: var(--ink); font-size: 20px; line-height: 1.4; }
 /* compact cards: no status words in the builder; green says picked, and a clash is
    resolved in a sheet the moment it would happen */
 :is(.builder, .day-list) .ag-status { display: none; }
@@ -631,4 +642,12 @@ html:has(.deck) { scroll-snap-type: y mandatory; scroll-padding-top: var(--heade
    as the talk cards, whatever their length, so the list reads as an even column */
 .day-list { display: grid; gap: var(--s1); }
 .day-list > :is(.ag-band, .ag-free) { min-height: 97px; justify-content: flex-start; }
-@media (prefers-reduced-motion: reduce) { .builder-bar span { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .builder-bar button::before { transition: none; } }
+
+/* the card title as a button (TalkDetails.tsx): reads as the title, opens the details sheet */
+button.ag-title { padding: 0; border: 0; background: none; text-align: left; cursor: pointer; }
+/* the details sheet: the /talks write-up, inside the sheet's own padding */
+.details { max-height: 60dvh; overflow-y: auto; margin-top: var(--s15); }
+.details :is(.tags, .session-desc, .session-people, .session-more) { margin-inline: 0; }
+.details .tags { display: flex; margin-top: 0; }
+.sheet-action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
