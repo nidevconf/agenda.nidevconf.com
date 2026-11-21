@@ -32,19 +32,21 @@ export default function BuilderStep({ step, panelRef }: BuilderStepProps) {
 function BreakStep({ pause, panelRef }: { pause: Pause; panelRef: (el: HTMLElement | null) => void }) {
   return (
     <section ref={panelRef} tabIndex={-1} className="builder-step builder-break">
-      <div
-        className="builder-break-art"
-        style={{ "--art-w": pause.art.reduce((w, e) => w + e.width, pause.gap), "--gap": pause.gap } as CSSProperties}
-      >
-        {pause.art.map((e) => (
-          <img
-            key={e.src}
-            src={`/images/emoji/${e.src}.png`}
-            alt=""
-            style={{ "--w": e.width, "--top": e.top, "--tilt": `${e.tilt}deg` } as CSSProperties}
-          />
-        ))}
-      </div>
+      {pause.art.length > 0 && (
+        <div
+          className="builder-break-art"
+          style={{ "--art-w": pause.art.reduce((w, e) => w + e.width, pause.gap * (pause.art.length - 1)), "--gap": pause.gap } as CSSProperties}
+        >
+          {pause.art.map((e) => (
+            <img
+              key={e.src}
+              src={`/images/emoji/${e.src}.png`}
+              alt=""
+              style={{ "--w": e.width, "--top": e.top, "--tilt": `${e.tilt}deg` } as CSSProperties}
+            />
+          ))}
+        </div>
+      )}
       <h2>{pause.heading}</h2>
       <p>{pause.message}</p>
     </section>

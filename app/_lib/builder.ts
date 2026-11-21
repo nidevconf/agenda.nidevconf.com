@@ -53,6 +53,30 @@ const PAUSES: Record<string, Pause> = {
     ],
     gap: 15,
   },
+  "Closing & prizes": {
+    heading: "Closing & Prizes",
+    message: "Back to Hall 1A to close the day. Prizes, thank-yous, and one last cheer.",
+    // an arch: the gold medal and the gift big and high in the middle, silver and bronze
+    // smaller, lower and tipped outwards at either end
+    art: [
+      { src: "second_place_medal", width: 58, top: 22, tilt: -10 },
+      { src: "first_place_medal", width: 80, top: 0, tilt: -3 },
+      { src: "gift", width: 80, top: 6, tilt: 4 },
+      { src: "third_place_medal", width: 58, top: 24, tilt: 10 },
+    ],
+    gap: 4,
+  },
+  "After-party": {
+    heading: "Afterparty",
+    message: "Food & drinks at Three Sheets, 1 Bankmore Square. Don't forget to get your wristband from Enso.",
+    // small pizza low on the left, the beers big in the middle, a mid-size popper tipped right
+    art: [
+      { src: "pizza", width: 42, top: 30, tilt: -8 },
+      { src: "beers", width: 106, top: 0, tilt: -2 },
+      { src: "tada", width: 64, top: 12, tilt: 10 },
+    ],
+    gap: 6,
+  },
 };
 
 const WORKSHOPS = LIVE.filter((t) => t.format === "Workshop").sort(byTime);
