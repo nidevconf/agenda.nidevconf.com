@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/talks`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${baseUrl}/workshops`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${baseUrl}/villages`, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${baseUrl}/maps`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${baseUrl}/speakers`, changeFrequency: "weekly", priority: 0.8 },
     ...SPEAKERS.map((s) => ({
       url: `${baseUrl}/speakers/${s.slug}`,

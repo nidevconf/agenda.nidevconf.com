@@ -38,6 +38,9 @@ export default function SiteHeader() {
             <Link href="/villages" onClick={close}>
               Villages
             </Link>
+            <Link href="/maps" onClick={close}>
+              Maps
+            </Link>
             <Link className="btn btn-primary" href="/agenda/build" onClick={close}>
               Build my agenda
             </Link>

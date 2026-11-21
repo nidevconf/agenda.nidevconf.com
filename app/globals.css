@@ -475,6 +475,12 @@ html:has(dialog[open]) { overflow: hidden; }
 .page { padding: var(--s3) 20px 48px; }
 .page-head h1 { font-size: clamp(28px, 6vw, 36px); font-weight: var(--fw-semibold); }
 .page-head p { margin-top: var(--s1); font-size: var(--fs-body); line-height: 1.5; color: var(--muted); max-width: 60ch; }
+.maps-jump { margin-top: var(--s3); }
+.venue-map { margin-top: var(--s4); scroll-margin-top: 96px; }
+.venue-map h2 { font-size: clamp(22px, 5vw, 28px); font-weight: var(--fw-semibold); }
+.venue-map p { margin-top: 4px; color: var(--muted); }
+.venue-map a { display: block; margin-top: var(--s2); }
+.venue-map img { display: block; width: 100%; height: auto; border-radius: var(--r); }
 .page-photo { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; margin-top: var(--s3); border-radius: var(--r); }
 
 /* ---- tags: small facts about a session ---- */
